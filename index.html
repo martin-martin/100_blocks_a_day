@@ -6,7 +6,11 @@
 		body {
 			max-width: 620px;
 			margin: auto;
-			margin-top: 100px;
+			margin-top: 50px;
+		}
+
+		#all-blocks {
+			margin-top: 50px;
 			display: flex;
 			justify-content: space-around;
 			flex-wrap: wrap;
@@ -18,19 +22,44 @@
 			border: 1px solid black;
 		}
 
-		.row {
-			background-color: red;
-			width: 100px;
-			height: 100px;
-			border: 1px solid black;
+		#time {
+			text-align: center;
 		}
+
 	</style>
-</head>
-<body>
 	<script type="text/javascript">
+		// display time at the top of the page
+		var startTime = function() {
+			var today = new Date();
+			var h = today.getHours();
+			var m = today.getMinutes();
+			var s = today.getSeconds();
+			m = checkTime(m);
+			s = checkTime(s);
+			document.getElementById("time").innerHTML = h + ":" + m + ":" + s;
+			// make it tick!
+			var t = setTimeout(startTime, 500);
+		};
+
+		var checkTime = function(i) {
+			if (i < 10) {
+				i = "0" + i; // add zero in front of numbers < 10
+			}
+			return i;
+		};
+	</script>
+</head>
+
+<body onload="startTime()">
+<div id="time"></div>
+<div id="all-blocks"></div>
+<script type="text/javascript">
+
+		// TODO: allow user to de-select button on second click action
+		// TODO: allow user to drag to select multiple blocks
 		var colorBlock = function() {
-			console.log("clicked");
-			this.style.backgroundColor = "red";
+			// TODO: allow different color selections for different time slots
+			this.style.backgroundColor = "orange";
 		};
 
 		for (var i = 0; i < 100; i++) {
@@ -39,9 +68,8 @@
 			block.id = "block" + (i + 1).toString();
 			block.className = "block";
 			block.addEventListener("click", colorBlock);
-			document.getElementsByTagName("body")[0].appendChild(block);
+			document.getElementById("all-blocks").appendChild(block);
 		}
-	</script>
-
+</script>
 </body>
 </html>
