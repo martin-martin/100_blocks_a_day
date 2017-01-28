@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>100 Blocks A Day</title>
+	<style type="text/css">
+		body {
+			max-width: 620px;
+			margin: auto;
+			margin-top: 100px;
+			display: flex;
+			justify-content: space-around;
+			flex-wrap: wrap;
+		}
+
+		.block {
+			width: 60px;
+			height: 60px;
+			border: 1px solid black;
+		}
+
+		.row {
+			background-color: red;
+			width: 100px;
+			height: 100px;
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var colorBlock = function() {
+			console.log("clicked");
+			this.style.backgroundColor = "red";
+		};
+
+		for (var i = 0; i < 100; i++) {
+			var block = document.createElement("div");
+			// adding +1 to the count to make it more human-intuitive (1-100)
+			block.id = "block" + (i + 1).toString();
+			block.className = "block";
+			block.addEventListener("click", colorBlock);
+			document.getElementsByTagName("body")[0].appendChild(block);
+		}
+	</script>
+
+</body>
+</html>
