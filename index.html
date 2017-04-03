@@ -61,21 +61,27 @@
 
 <body onload="startTime()">
 <div id="time"></div>
+
 <!-- TODO: make it possible to change the color that a square assumes when clicked -->
+
 <button id="color-switch" onclick="switchColor()">Change Color</button>
 <div id="all-blocks"></div>
 <script type="text/javascript">
+
 		// TODO: allow user to drag to select multiple blocks
+
 		var colorBlock = function() {
 			var color = "red";
-			if (this.style.backgroundColor == "white") {
+			if (this.style.backgroundColor == "") {
 				this.style.backgroundColor = color;
 			}
-			// restore white color on second click
+			// restore no color on second click
 			else {
-				this.style.backgroundColor = "white";
+				this.style.backgroundColor = "";
 			}
+
 			// TODO: allow different color selections for different time slots
+
 		};
 
 		for (var i = 0; i < 100; i++) {
