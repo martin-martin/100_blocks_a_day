@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>100 Blocks A Day</title>
+	<script src="d3.min.js"></script>
 	<style type="text/css">
 		body {
 			max-width: 620px;
@@ -47,15 +48,6 @@
 			}
 			return i;
 		};
-
-		var switchColor = function(color) {
-			if (color == "orange") {
-				color = "red";
-			}
-			else {
-				color = "orange";
-			}
-		};
 	</script>
 </head>
 
@@ -64,14 +56,32 @@
 
 <!-- TODO: make it possible to change the color that a square assumes when clicked -->
 
-<button id="color-switch" onclick="switchColor()">Change Color</button>
+<button id="color-switch" onclick="switchColor(color)">Change Color</button>
 <div id="all-blocks"></div>
 <script type="text/javascript">
+
+		var color = "";
+
+		//console.log(color);
+
+		var switchColor = function(color) {
+			console.log(color);
+			if (color == "orange") {
+				color = "red";
+			}
+			else {
+				color = "orange";
+			}
+			return color;
+		};
+
+		var color = switchColor(color);
+		//console.log(color);
 
 		// TODO: allow user to drag to select multiple blocks
 
 		var colorBlock = function() {
-			var color = "red";
+
 			if (this.style.backgroundColor == "") {
 				this.style.backgroundColor = color;
 			}
@@ -84,13 +94,15 @@
 
 		};
 
+		// creating the blocks with d3
+		var allBlocks = d3.select('#all-blocks');
 		for (var i = 0; i < 100; i++) {
-			var block = document.createElement("div");
+			var block = allBlocks.append('div');
 			// adding +1 to the count to make it more human-intuitive (1-100)
-			block.id = "block" + (i + 1).toString();
-			block.className = "block";
-			block.addEventListener("click", colorBlock);
-			document.getElementById("all-blocks").appendChild(block);
+			var blockID = "block" + (i + 1).toString();
+			block.attr('id', blockID)
+					.attr('class', 'block')
+					.on('click', colorBlock);
 		}
 </script>
 </body>
