@@ -5,7 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="theme-color" content="#1b1f3b">
 	<title>100 Blocks A Day</title>
-	<script src="d3.min.js"></script>
 	<style type="text/css">
 		:root {
 			--bg: #f4f5fb;
@@ -343,59 +342,79 @@
 			used++;
 		});
 
-		var summary = d3.select("#summary");
-		summary.selectAll("*").remove();
+		var summary = document.getElementById("summary");
+		summary.innerHTML = "";
 
 		CATEGORIES.forEach(function(cat) {
 			if (cat.id === "erase" || !counts[cat.id]) { return; }
 			var n = counts[cat.id];
 			var mins = n * MINUTES_PER_BLOCK;
 			var label = n + " · " + Math.floor(mins / 60) + "h" + pad(mins % 60);
-			var stat = summary.append("div").attr("class", "stat");
-			stat.append("span").attr("class", "dot").style("background-color", cat.color);
-			stat.append("span").text(cat.label + ": " + label);
+			var stat = document.createElement("div");
+			stat.className = "stat";
+			var dot = document.createElement("span");
+			dot.className = "dot";
+			dot.style.backgroundColor = cat.color;
+			stat.appendChild(dot);
+			var text = document.createElement("span");
+			text.textContent = cat.label + ": " + label;
+			stat.appendChild(text);
+			summary.appendChild(stat);
 		});
 
-		var total = summary.append("div").attr("class", "stat total");
-		total.append("span").text(used + " / " + TOTAL_BLOCKS + " blocks planned");
+		var total = document.createElement("div");
+		total.className = "stat total";
+		var totalText = document.createElement("span");
+		totalText.textContent = used + " / " + TOTAL_BLOCKS + " blocks planned";
+		total.appendChild(totalText);
+		summary.appendChild(total);
 	}
 
 	// ---- palette ----------------------------------------------------------
 	function buildPalette() {
-		var palette = d3.select("#palette");
+		var palette = document.getElementById("palette");
 		CATEGORIES.forEach(function(cat) {
-			var btn = palette.append("button")
-				.attr("type", "button")
-				.attr("class", cat.id === "erase" ? "swatch erase" : "swatch")
-				.attr("data-cat", cat.id)
-				.attr("aria-pressed", cat.id === activeCategory ? "true" : "false")
-				.on("click", function() { setActive(cat.id); });
-			btn.append("span").attr("class", "dot")
-				.style("background-color", cat.color || null);
-			btn.append("span").text(cat.label);
+			var btn = document.createElement("button");
+			btn.type = "button";
+			btn.className = cat.id === "erase" ? "swatch erase" : "swatch";
+			btn.setAttribute("data-cat", cat.id);
+			btn.setAttribute("aria-pressed", cat.id === activeCategory ? "true" : "false");
+			btn.addEventListener("click", function() { setActive(cat.id); });
+
+			var dot = document.createElement("span");
+			dot.className = "dot";
+			if (cat.color) { dot.style.backgroundColor = cat.color; }
+			btn.appendChild(dot);
+
+			var text = document.createElement("span");
+			text.textContent = cat.label;
+			btn.appendChild(text);
+
+			palette.appendChild(btn);
 		});
 	}
 
 	function setActive(id) {
 		activeCategory = id;
-		d3.selectAll(".swatch").attr("aria-pressed", function() {
-			return this.getAttribute("data-cat") === id ? "true" : "false";
-		});
+		var swatches = document.querySelectorAll(".swatch");
+		for (var i = 0; i < swatches.length; i++) {
+			swatches[i].setAttribute("aria-pressed",
+				swatches[i].getAttribute("data-cat") === id ? "true" : "false");
+		}
 	}
 
 	// ---- blocks + painting ------------------------------------------------
 	function buildBlocks() {
-		var allBlocks = d3.select("#all-blocks");
+		var allBlocks = document.getElementById("all-blocks");
 		for (var i = 0; i < TOTAL_BLOCKS; i++) {
-			allBlocks.append("div")
-				.attr("class", "block")
-				.attr("data-idx", i)
-				.attr("title", "Block " + (i + 1));
+			var block = document.createElement("div");
+			block.className = "block";
+			block.setAttribute("data-idx", i);
+			block.title = "Block " + (i + 1);
+			// reflect any saved plan
+			renderBlockFromPlan(block, String(i));
+			allBlocks.appendChild(block);
 		}
-		// reflect any saved plan
-		d3.selectAll(".block").each(function() {
-			renderBlockFromPlan(this, this.getAttribute("data-idx"));
-		});
 	}
 
 	function blockUnderPoint(x, y) {
@@ -438,10 +457,11 @@
 	document.getElementById("clear-day").addEventListener("click", function() {
 		plan = {};
 		savePlan();
-		d3.selectAll(".block").each(function() {
-			this.style.backgroundColor = "";
-			this.classList.remove("filled");
-		});
+		var blocks = document.querySelectorAll(".block");
+		for (var i = 0; i < blocks.length; i++) {
+			blocks[i].style.backgroundColor = "";
+			blocks[i].classList.remove("filled");
+		}
 		updateSummary();
 	});
 
