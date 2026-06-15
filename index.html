@@ -173,6 +173,42 @@
 
 		.block.filled { border-color: transparent; }
 
+		/* the block matching the current time */
+		.block.now {
+			box-shadow: 0 0 0 3px var(--ink);
+			z-index: 1;
+			animation: nowPulse 2s ease-in-out infinite;
+		}
+
+		@keyframes nowPulse {
+			0%, 100% { box-shadow: 0 0 0 3px var(--ink); }
+			50% { box-shadow: 0 0 0 3px rgba(27, 31, 59, 0.35); }
+		}
+
+		.settings {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-top: 12px;
+			font-size: 0.85rem;
+			color: var(--muted);
+		}
+
+		.settings label { font-weight: 500; }
+
+		.settings input[type="time"] {
+			font: inherit;
+			padding: 5px 8px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: #fff;
+			color: var(--ink);
+		}
+
+		.settings #now-label { color: var(--ink); font-weight: 600; }
+
 		.summary {
 			display: flex;
 			flex-wrap: wrap;
@@ -219,6 +255,11 @@
 			<span id="time">--:--:--</span>
 			<span id="date"></span>
 		</div>
+		<div class="settings">
+			<label for="day-start">My day starts at</label>
+			<input type="time" id="day-start" value="06:00">
+			<span id="now-label"></span>
+		</div>
 	</header>
 
 	<section class="panel">
@@ -248,6 +289,9 @@
 
 	var TOTAL_BLOCKS = 100;
 	var MINUTES_PER_BLOCK = 10;
+	// 100 blocks x 10 min = 1000 min = the ~16h40m waking day.
+	var DAY_START_KEY = "day-start";
+	var dayStartMinutes = 6 * 60; // default: day starts at 06:00
 
 	// Category palette. The first entry (Erase) clears a block.
 	var CATEGORIES = [
@@ -277,7 +321,35 @@
 			pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
 		document.getElementById("date").textContent =
 			now.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+		updateCurrentBlock(now);
 		setTimeout(tick, 500);
+	}
+
+	// Which block (0-99) corresponds to "now", or -1 if outside the day window.
+	function currentBlockIndex(now) {
+		var minutesIntoDay = (now.getHours() * 60 + now.getMinutes()) - dayStartMinutes;
+		if (minutesIntoDay < 0) {
+			minutesIntoDay += 24 * 60; // day window wraps past midnight
+		}
+		var idx = Math.floor(minutesIntoDay / MINUTES_PER_BLOCK);
+		return (idx >= 0 && idx < TOTAL_BLOCKS) ? idx : -1;
+	}
+
+	function updateCurrentBlock(now) {
+		var idx = currentBlockIndex(now);
+		var prev = document.querySelector(".block.now");
+		var label = document.getElementById("now-label");
+
+		if (idx < 0) {
+			if (prev) { prev.classList.remove("now"); }
+			label.textContent = "(outside your day)";
+			return;
+		}
+
+		var target = document.querySelector('.block[data-idx="' + idx + '"]');
+		if (prev && prev !== target) { prev.classList.remove("now"); }
+		if (target) { target.classList.add("now"); }
+		label.textContent = "· now on block " + (idx + 1);
 	}
 
 	// ---- persistence (one saved plan per calendar day) --------------------
@@ -465,10 +537,30 @@
 		updateSummary();
 	});
 
+	function setupDayStart() {
+		var input = document.getElementById("day-start");
+		var saved = null;
+		try { saved = localStorage.getItem(DAY_START_KEY); } catch (e) { /* ignore */ }
+		if (saved) { input.value = saved; }
+
+		function apply() {
+			var parts = input.value.split(":");
+			if (parts.length === 2) {
+				dayStartMinutes = (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
+			}
+			try { localStorage.setItem(DAY_START_KEY, input.value); } catch (e) { /* ignore */ }
+			updateCurrentBlock(new Date());
+		}
+
+		input.addEventListener("change", apply);
+		apply(); // sync dayStartMinutes with whatever value the input holds
+	}
+
 	loadPlan();
 	buildPalette();
 	buildBlocks();
 	setupPainting();
+	setupDayStart();
 	updateSummary();
 	setActive(activeCategory);
 	tick();
