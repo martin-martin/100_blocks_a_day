@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="theme-color" content="#1b1f3b">
+	<title>100 Blocks a Day</title>
+	<link rel="manifest" href="manifest.webmanifest">
+	<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+	<link rel="apple-touch-icon" href="icons/icon-192.png">
+	<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="wrap">
+	<header>
+		<h1>100 Blocks a Day</h1>
+		<p>Your waking day is about 100 ten-minute blocks. Pick a category, then click or drag to plan it.</p>
+		<div class="clock">
+			<span id="time">--:--:--</span>
+			<span id="date"></span>
+		</div>
+		<div class="settings">
+			<label for="day-start">My day starts at</label>
+			<input type="time" id="day-start" value="06:00">
+			<span id="now-label"></span>
+		</div>
+		<div class="account" id="account"></div>
+	</header>
+
+	<section class="panel">
+		<div class="datebar">
+			<button class="nav" id="prev-day" type="button" aria-label="Previous day">&#8249;</button>
+			<input type="date" id="date-picker">
+			<button class="nav" id="next-day" type="button" aria-label="Next day">&#8250;</button>
+			<button class="pill-btn" id="today-btn" type="button">Today</button>
+			<span class="today-tag" id="today-tag"></span>
+		</div>
+	</section>
+
+	<section class="panel">
+		<div class="panel-head">
+			<h2>Categories</h2>
+			<button id="clear-day" class="pill-btn danger" type="button">Clear day</button>
+		</div>
+		<div class="palette" id="palette"></div>
+	</section>
+
+	<section class="panel">
+		<div id="all-blocks"></div>
+	</section>
+
+	<section class="panel">
+		<div class="summary" id="summary"></div>
+	</section>
+
+	<section class="panel" id="history-panel">
+		<div class="panel-head"><h2>History</h2></div>
+		<div class="history-list" id="history"></div>
+	</section>
+
+	<footer>
+		Inspired by <a href="https://waitbutwhy.com/2016/10/100-blocks-day.html" target="_blank" rel="noopener">Wait But Why &mdash; 100 Blocks a Day</a>.
+	</footer>
+</div>
+
+<!-- Sign-in overlay (only shown when a backend is available but you're signed out) -->
+<div class="overlay" id="auth-overlay" hidden>
+	<div class="auth-card">
+		<h2>100 Blocks a Day</h2>
+		<p class="sub">Sign in to sync your plans across devices.</p>
+		<div class="auth-tabs">
+			<button id="tab-login" aria-selected="true" type="button">Sign in</button>
+			<button id="tab-register" aria-selected="false" type="button">Create account</button>
+		</div>
+		<form id="auth-form">
+			<label for="auth-username">Username</label>
+			<input id="auth-username" autocomplete="username" required>
+			<label for="auth-password">Password</label>
+			<input id="auth-password" type="password" autocomplete="current-password" required>
+			<button class="submit" id="auth-submit" type="submit">Sign in</button>
+			<div class="error" id="auth-error"></div>
+		</form>
+		<div class="local-link">
+			<button class="linkish" id="use-local" type="button">Use without an account (this device only)</button>
+		</div>
+	</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
