@@ -1,0 +1,8 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local database
+backend/blocks.db
+backend/*.db
